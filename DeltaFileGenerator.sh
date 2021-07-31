@@ -11,6 +11,16 @@ csv2=/Users/vdhudum/Documents/ContactsFromSalesforce_2021-Jul-6_151215.csv
 
 echo "received fileName-->$1"
 
+if [[ $1 == *"__WABASH__"* ]]; then
+    echo "This is category-1 file";
+    isCategory_1_File=true;
+fi
+
+if [ $1 == *"__WILEY__"* ] || [ $1 == *"__ARISTOCRAT__"* ]; then
+    echo "This is category-2 file";
+    isCategory_2_File=true;
+fi
+
 # replace ".csv" in incoming file's name and replace it with "_DELTA.csv" to form the name of file to write delta
 deltaFileName=${1/\.csv/_DELTA\.csv}
 
@@ -36,6 +46,9 @@ while read line; do
         echo "Email is --> $compEmail";
         emailLen=`echo $compEmail | wc -m`
 
+        category_1_suffix="\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\"";
+        category_2_suffix="\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\"";
+
         # Only process those HRIS records that has Company Email on them
         if [ $emailLen -gt 1 ]; then
             #Check if company email exist in SF export
@@ -44,7 +57,7 @@ while read line; do
                 echo "Matching email found for $compEmail"
 
                 #Check if entire employee record matches with SF data. Phone number is excluded for comparision
-                currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\"${currRow[3]}\",\"${currRow[4]}\",\".*\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
+                currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\"${currRow[3]}\",\"${currRow[4]}\",\".*\",$category_1_suffix"
 
                 #rowMatchResult=$(grep -q $line "$csv2");
 
@@ -55,15 +68,36 @@ while read line; do
                 # Perform GREP with SF file based on whether Preferred FirstName and Preferred LastName has value in it or not. If there is no value in those(one or both) fields, exclude them while doing grep.
                 if [ $prefFNameLen -le 1 ]; then
                     echo "${currRow[4]} has EMPTY Pref FirstName"
-                    currentRow="${currRow[0]}\",\"${currRow[1]}\",\".*\",\"${currRow[3]}\",\"${currRow[4]}\",\".*\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
+
+                    # Check if it is category 1 or category 2 file and use the variable accordingly to include the relevant fields
+                    if [ $isCategory_1_File = true ]; then
+                        echo "Cat-1 row";
+                        currentRow="${currRow[0]}\",\"${currRow[1]}\",\".*\",\"${currRow[3]}\",\"${currRow[4]}\",\".*\",$category_1_suffix"
+                    else
+                        echo "Cat-2 row";
+                        currentRow="${currRow[0]}\",\"${currRow[1]}\",\".*\",\"${currRow[3]}\",\"${currRow[4]}\",\".*\",$category_2_suffix"
+                    fi
+
                     if [ $prefLNameLen -le 1 ]; then
                         echo "${currRow[4]} has EMPTY lastName"
-                        currentRow="${currRow[0]}\",\"${currRow[1]}\",\".*\",\"${currRow[4]}\",\".*\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
+                        if [ $isCategory_1_File = true ]; then
+                            echo "Cat-1 row";
+                            currentRow="${currRow[0]}\",\"${currRow[1]}\",\".*\",\"${currRow[4]}\",\".*\",$category_1_suffix"
+                        else
+                            echo "Cat-2 row";
+                            currentRow="${currRow[0]}\",\"${currRow[1]}\",\".*\",\"${currRow[4]}\",\".*\",$category_2_suffix"
+                        fi
                     fi
                 else
                     if [ $prefLNameLen -le 1 ]; then
                         echo "${currRow[4]} has FirstName but EMPTY lastName"
-                        currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\".*\",\"${currRow[4]}\",\".*\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
+                        if [ $isCategory_1_File = true ]; then
+                            echo "Cat-1 row";
+                            currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\".*\",\"${currRow[4]}\",\".*\",$category_1_suffix"
+                        else
+                            echo "Cat-2 row";
+                            currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\".*\",\"${currRow[4]}\",\".*\",$category_2_suffix"
+                        fi
                     fi
                 fi
 
