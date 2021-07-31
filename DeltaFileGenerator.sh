@@ -44,15 +44,15 @@ while read line; do
                 echo "Matching email found for $compEmail"
 
                 # Unformat the work phone number(if its provided)
-                phNo=${currRow[5]}
-                phNoLen=`echo $phNo | wc -m`
-                if [ $emailLen -gt 1 ]; then
-                    phNo=`echo ${phNo//-/ }`
-                    $phNo=`echo ${phNo// /}`
-                    phNo=`echo ${phNo//(/}`
-                    phNo=`echo ${phNo//)/}`
-                fi
-                echo "Unformatted Phone Number --> $phNo";
+                # phNo=${currRow[5]}
+                # phNoLen=`echo $phNo | wc -m`
+                # if [ $emailLen -gt 1 ]; then
+                #     phNo=`echo ${phNo//-/ }`
+                #     $phNo=`echo ${phNo// /}`
+                #     phNo=`echo ${phNo//(/}`
+                #     phNo=`echo ${phNo//)/}`
+                # fi
+                # echo "Unformatted Phone Number --> $phNo";
 
                 #Check if entire employee record matches with SF data
                 currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\"${currRow[3]}\",\"${currRow[4]}\",\"$phNo\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
