@@ -5,7 +5,7 @@
 
 csv1=$1
 # csv2=/var/Integration/HRIS/Inbound/FormDelta/ContactsFromSalesforce_2021-Jun-28_134116.csv
-csv2=ContactsFromSalesforce_2021-Jul-6_151215.csv
+csv2=/Users/vdhudum/Documents/ContactsFromSalesforce_2021-Jul-6_151215.csv
 
 # csv2=ContactsFromSalesforce.csv
 
@@ -43,37 +43,27 @@ while read line; do
             if [ $? -eq 0 ]; then
                 echo "Matching email found for $compEmail"
 
-                # Unformat the work phone number(if its provided)
-                # phNo=${currRow[5]}
-                # phNoLen=`echo $phNo | wc -m`
-                # if [ $emailLen -gt 1 ]; then
-                #     phNo=`echo ${phNo//-/ }`
-                #     $phNo=`echo ${phNo// /}`
-                #     phNo=`echo ${phNo//(/}`
-                #     phNo=`echo ${phNo//)/}`
-                # fi
-                # echo "Unformatted Phone Number --> $phNo";
-
-                #Check if entire employee record matches with SF data
-                currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\"${currRow[3]}\",\"${currRow[4]}\",\"$phNo\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
+                #Check if entire employee record matches with SF data. Phone number is excluded for comparision
+                currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\"${currRow[3]}\",\"${currRow[4]}\",\".*\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
 
                 #rowMatchResult=$(grep -q $line "$csv2");
 
                 prefFNameLen=`echo ${currRow[2]} | wc -m`
                 prefLNameLen=`echo ${currRow[3]} | wc -m`
 
+                # Phone number is always excluded for comparision
                 # Perform GREP with SF file based on whether Preferred FirstName and Preferred LastName has value in it or not. If there is no value in those(one or both) fields, exclude them while doing grep.
                 if [ $prefFNameLen -le 1 ]; then
                     echo "${currRow[4]} has EMPTY Pref FirstName"
-                    currentRow="${currRow[0]}\",\"${currRow[1]}\",\".*\",\"${currRow[3]}\",\"${currRow[4]}\",\"${currRow[5]}\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
+                    currentRow="${currRow[0]}\",\"${currRow[1]}\",\".*\",\"${currRow[3]}\",\"${currRow[4]}\",\".*\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
                     if [ $prefLNameLen -le 1 ]; then
                         echo "${currRow[4]} has EMPTY lastName"
-                        currentRow="${currRow[0]}\",\"${currRow[1]}\",\".*\",\"${currRow[4]}\",\"${currRow[5]}\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
+                        currentRow="${currRow[0]}\",\"${currRow[1]}\",\".*\",\"${currRow[4]}\",\".*\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
                     fi
                 else
                     if [ $prefLNameLen -le 1 ]; then
                         echo "${currRow[4]} has FirstName but EMPTY lastName"
-                        currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\".*\",\"${currRow[4]}\",\"${currRow[5]}\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
+                        currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\".*\",\"${currRow[4]}\",\".*\",\"${currRow[6]}\",\"${currRow[7]}\",\"${currRow[8]}\",\"${currRow[9]}\",\"${currRow[10]}\",\"${currRow[11]}\",\"${currRow[12]}\",\"${currRow[13]}\",\"${currRow[14]}\",\"${currRow[15]}\",\"${currRow[16]}\",\"${currRow[17]}\",\"${currRow[18]}\",\"${currRow[19]}\""
                     fi
                 fi
 
