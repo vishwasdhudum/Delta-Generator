@@ -5,7 +5,9 @@
 
 csv1=$1
 # csv2=/var/Integration/HRIS/Inbound/FormDelta/ContactsFromSalesforce_2021-Jun-28_134116.csv
+
 csv2=/Users/vdhudum/Documents/ContactsFromSalesforce_2021-Jul-6_151215.csv
+# csv2=/Users/vdhudum/Documents/ContactsFromSalesforce__WILEY__2021-Aug-1_000757.csv
 
 # csv2=ContactsFromSalesforce.csv
 
@@ -14,18 +16,27 @@ echo "received fileName-->$1"
 if [[ $1 == *"__WABASH__"* ]]; then
     echo "This is category-1 file";
     isCategory_1_File=true;
+    isCategory_2_File=false;
 fi
 
-if [ $1 == *"__WILEY__"* ] || [ $1 == *"__ARISTOCRAT__"* ]; then
+#if [ $1 == *"__WILEY__"* ] || [ $1 == *"__ARISTOCRAT__"* ]; then
+if [[ $1 == *"__WILEY__"* ]]; then
     echo "This is category-2 file";
     isCategory_2_File=true;
+    isCategory_1_File=false;
 fi
 
 # replace ".csv" in incoming file's name and replace it with "_DELTA.csv" to form the name of file to write delta
 deltaFileName=${1/\.csv/_DELTA\.csv}
 
+if [ $isCategory_1_File = true ]; then
+    fileHeader="\"Legal FirstName\",\"Legal LastName\",\"Preferred FirstName\",\"Preferred LastName\",\"Company Email\",\"Phone Number\",\"Employee ID\",\"Employee Type\",\"Zip Code\",\"Department\",\"Manager's First Name\",\"Manager's Last Name\",\"Manager Email\",\"Current Education Level\",\"Work Location\",\"Country\",\"Job Title\",\"Active\",\"Cost Center\",\"Pay Group\",\"File Number\"";
+else
+    fileHeader="\"Legal FirstName\",\"Legal LastName\",\"Preferred FirstName\",\"Preferred LastName\",\"Company Email\",\"Phone Number\",\"Employee ID\",\"Employee Type\",\"Zip Code\",\"Department\",\"Manager's First Name\",\"Manager's Last Name\",\"Manager Email\",\"Current Education Level\",\"Work Location\",\"Country\",\"Job Title\",\"Active\",\"Cost Center\"";
+fi;
 
-echo "FILE HEADER" > $deltaFileName;
+#echo "FILE HEADER" > $deltaFileName;
+echo $fileHeader > $deltaFileName;
 
 while read line; do
     echo "************************************"
@@ -57,8 +68,11 @@ while read line; do
                 echo "Matching email found for $compEmail"
 
                 #Check if entire employee record matches with SF data. Phone number is excluded for comparision
-                currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\"${currRow[3]}\",\"${currRow[4]}\",\".*\",$category_1_suffix"
-
+                if [ $isCategory_1_File = true ]; then
+                    currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\"${currRow[3]}\",\"${currRow[4]}\",\".*\",$category_1_suffix";
+                else
+                    currentRow="${currRow[0]}\",\"${currRow[1]}\",\"${currRow[2]}\",\"${currRow[3]}\",\"${currRow[4]}\",\".*\",$category_2_suffix";
+                fi
                 #rowMatchResult=$(grep -q $line "$csv2");
 
                 prefFNameLen=`echo ${currRow[2]} | wc -m`
